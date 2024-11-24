@@ -1,0 +1,155 @@
+package Assignment10;
+
+import java.util.LinkedList;
+import java.util.Scanner;
+
+class UserProfile {
+    String username;
+    String post;
+    String comment;
+    String preference;
+
+    public UserProfile(String username, String post, String comment, String preference) {
+        this.username = username;
+        this.post = post;
+        this.comment = comment;
+        this.preference = preference;
+    }
+
+    @Override
+    public String toString() {
+        return "Username: " + username + "\nPost: " + post + "\nComment: " + comment + "\nPreference: " + preference;
+    }
+}
+
+class HashTable {
+    private int TABLE_SIZE = 10;
+    private LinkedList<UserProfile>[] table;
+
+    public HashTable() {
+        table = new LinkedList[TABLE_SIZE];
+        for (int i = 0; i < TABLE_SIZE; i++) {
+            table[i] = new LinkedList<>();
+        }
+    }
+
+    private int hashFunction(String key) {
+        int hashCode = 0;
+        for (char c : key.toCharArray()) {
+            hashCode += c;
+        }
+        return hashCode % TABLE_SIZE;
+    }
+
+    public void addProfile(UserProfile profile) {
+        int index = hashFunction(profile.username);
+        table[index].add(profile);
+    }
+
+    public UserProfile getProfile(String username) {
+        int index = hashFunction(username);
+        for (UserProfile profile : table[index]) {
+            if (profile.username.equals(username)) {
+                return profile;
+            }
+        }
+        return null;
+    }
+
+    public void updateProfile(String username, String post, String comment, String preference) {
+        UserProfile profile = getProfile(username);
+        if (profile != null) {
+            profile.post = post;
+            profile.comment = comment;
+            profile.preference = preference;
+        }
+    }
+
+    public void deleteProfile(String username) {
+        int index = hashFunction(username);
+        table[index].removeIf(profile -> profile.username.equals(username));
+    }
+
+    public void displayAllProfiles() {
+        for (int i = 0; i < TABLE_SIZE; i++) {
+            if (!table[i].isEmpty()) {
+                System.out.println("Index " + i + ":");
+                for (UserProfile profile : table[i]) {
+                    System.out.println(profile);
+                    System.out.println("------------");
+                }
+            }
+        }
+    }
+}
+
+public class SocialMediaPlatform {
+    public static void main(String[] args) {
+        HashTable hashTable = new HashTable();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Menu:");
+            System.out.println("1. Add User Profile");
+            System.out.println("2. Retrieve User Profile");
+            System.out.println("3. Update User Profile");
+            System.out.println("4. Delete User Profile");
+            System.out.println("5. Display All Profiles");
+            System.out.println("6. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Username: ");
+                    String username = scanner.nextLine();
+                    System.out.print("Enter Post: ");
+                    String post = scanner.nextLine();
+                    System.out.print("Enter Comment: ");
+                    String comment = scanner.nextLine();
+                    System.out.print("Enter Preference: ");
+                    String preference = scanner.nextLine();
+                    UserProfile profile = new UserProfile(username, post, comment, preference);
+                    hashTable.addProfile(profile);
+                    break;
+                case 2:
+                    System.out.print("Enter Username to Retrieve: ");
+                    String retrieveUsername = scanner.nextLine();
+                    UserProfile retrievedProfile = hashTable.getProfile(retrieveUsername);
+                    if (retrievedProfile != null) {
+                        System.out.println(retrievedProfile);
+                    } else {
+                        System.out.println("Profile not found.");
+                    }
+                    break;
+                case 3:
+                    System.out.print("Enter Username to Update: ");
+                    String updateUsername = scanner.nextLine();
+                    System.out.print("Enter Updated Post: ");
+                    String updatePost = scanner.nextLine();
+                    System.out.print("Enter Updated Comment: ");
+                    String updateComment = scanner.nextLine();
+                    System.out.print("Enter Updated Preference: ");
+                    String updatePreference = scanner.nextLine();
+                    hashTable.updateProfile(updateUsername, updatePost, updateComment, updatePreference);
+                    break;
+                case 4:
+                    System.out.print("Enter Username to Delete: ");
+                    String deleteUsername = scanner.nextLine();
+                    hashTable.deleteProfile(deleteUsername);
+                    break;
+                case 5:
+                    hashTable.displayAllProfiles();
+                    break;
+                case 6:
+                    return;
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        }
+    }
+}
+
+
+
