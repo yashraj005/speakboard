@@ -1,0 +1,121 @@
+package Assignment5;
+
+import java.util.Scanner;
+
+class Node {
+    int data;
+    Node left, right;
+    boolean leftThread, rightThread;
+
+    Node(int data) {
+        this.data = data;
+        this.left = this.right = null;
+        this.leftThread = this.rightThread = false;
+    }
+}
+
+class ThreadedBinaryTree {
+    private Node root;
+
+    public void insert(int data) {
+        Node newNode = new Node(data);
+        if (root == null) {
+            root = newNode;
+            return;
+        }
+
+        Node parent = null;
+        Node current = root;
+
+        while (current != null) {
+            parent = current;
+            if (data < current.data) {
+                if (!current.leftThread) {
+                    current = current.left;
+                } else {
+                    break;
+                }
+            } else {
+                if (!current.rightThread) {
+                    current = current.right;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        if (data < parent.data) {
+            newNode.left = parent.left;
+            newNode.right = parent;
+            parent.leftThread = false;
+            parent.left = newNode;
+        } else {
+            newNode.right = parent.right;
+            newNode.left = parent;
+            parent.rightThread = false;
+            parent.right = newNode;
+        }
+    }
+
+    public void inorder() {
+        if (root == null) {
+            System.out.println("Tree is empty.");
+            return;
+        }
+
+        Node current = root;
+        while (!current.leftThread) {
+            current = current.left;
+        }
+
+        while (current != null) {
+            System.out.print(current.data + " ");
+            if (current.rightThread) {
+                current = current.right;                  
+            } else {
+                current = current.right;
+                while (current != null && !current.leftThread) {
+                    current = current.left;
+                }
+            }
+        }
+        System.out.println();
+    }
+}
+
+public class ThreadedBinaryTreeApp {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ThreadedBinaryTree tbt = new ThreadedBinaryTree();
+        int choice, data;
+
+        while (true) {
+            System.out.println("Menu:");
+            System.out.println("1. Insert");
+            System.out.println("2. Inorder Traversal");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter data to insert: ");
+                    data = scanner.nextInt();
+                    tbt.insert(data);
+                    break;
+                case 2:
+                    tbt.inorder();
+                    break;
+                case 3:
+                scanner.close();
+                return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+
+       
+    }
+}
+
+
