@@ -1,0 +1,47 @@
+package Assignment9;
+
+import java.util.PriorityQueue;
+import java.util.Scanner;
+
+public class MarksHeap {
+
+    private PriorityQueue<Integer> minHeap;
+    private PriorityQueue<Integer> maxHeap;
+
+    public MarksHeap() {
+        minHeap = new PriorityQueue<>();
+        maxHeap = new PriorityQueue<>((a, b) -> b - a);
+    }
+
+    public void addMarks(int marks) {
+        minHeap.add(marks);
+        maxHeap.add(marks);
+    }
+
+    public int getMaxMarks() {
+        return maxHeap.peek();
+    }
+
+    public int getMinMarks() {
+        return minHeap.peek();
+    }
+
+    public static void main(String[] args) {
+        MarksHeap marksHeap = new MarksHeap();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter the number of students: ");
+        int n = scanner.nextInt();
+
+        System.out.println("Enter the marks of " + n + " students:");
+        for (int i = 0; i < n; i++) {
+            int marks = scanner.nextInt();
+            marksHeap.addMarks(marks);
+        }
+
+        System.out.println("Maximum marks obtained: " + marksHeap.getMaxMarks());
+        System.out.println("Minimum marks obtained: " + marksHeap.getMinMarks());
+    }
+}
+
+
+
