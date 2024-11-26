@@ -987,3 +987,612 @@ public class PhoneBookApplication {
         scanner.close();
     }
 }
+
+
+
+krushkals algo 
+
+
+import java.util.*;
+
+class Edge implements Comparable<Edge> {
+    int src, dest, wt;
+
+    Edge(int src, int dest, int wt) {
+        this.src = src;
+        this.dest = dest;
+        this.wt = wt;
+    }
+
+    public int compareTo(Edge other) {
+        return this.wt - other.wt;
+    }
+}
+
+public class kruskal {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter number of vertices:");
+        int v = scanner.nextInt();
+        List<Edge> edges = new ArrayList<>();
+
+        while (true) {
+            System.out.println("Menu:");
+            System.out.println("1. Add an edge");
+            System.out.println("2. Calculate MST and total cost");
+            System.out.println("3. Exit");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+
+            if (choice == 1) {
+                System.out.print("Enter source vertex: ");
+                int src = scanner.nextInt();
+                System.out.print("Enter destination vertex: ");
+                int dest = scanner.nextInt();
+                System.out.print("Enter weight of the edge: ");
+                int wt = scanner.nextInt();
+                edges.add(new Edge(src, dest, wt));
+            } else if (choice == 2) {
+                runKruskal(v, edges);
+            } else if (choice == 3) {
+                System.out.println("Exiting...");
+                break;
+            } else {
+                System.out.println("Invalid choice, please try again.");
+            }
+        }
+
+        scanner.close();
+    }
+
+    static void runKruskal(int v, List<Edge> edges) {
+        Collections.sort(edges);
+
+        int[] parent = new int[v];
+        int[] rank = new int[v];
+        for (int i = 0; i < v; i++) {
+            parent[i] = i;
+            rank[i] = 0;
+        }
+
+        List<Edge> mst = new ArrayList<>();
+        int mstCost = 0;
+
+        for (Edge edge : edges) {
+            int root1 = find(parent, edge.src);
+            int root2 = find(parent, edge.dest);
+
+            if (root1 != root2) {
+                mst.add(edge);
+                mstCost += edge.wt;
+                union(parent, rank, root1, root2);
+            }
+        }
+
+        System.out.println("Edges in the Minimum Spanning Tree:");
+        for (Edge edge : mst) {
+            System.out.println(edge.src + " -- " + edge.dest + " == " + edge.wt);
+        }
+        System.out.println("Total cost of MST: " + mstCost);
+    }
+
+    static int find(int[] parent, int node) {
+        if (parent[node] != node) {
+            parent[node] = find(parent, parent[node]);
+        }
+        return parent[node];
+    }
+
+    static void union(int[] parent, int[]    rank, int root1, int root2) {
+        if (rank[root1] < rank[root2]) {
+            parent[root1] = root2;
+        } else if (rank[root1] > rank[root2]) {
+            parent[root2] = root1;
+        } else {
+            parent[root2] = root1;
+            rank[root1]++;
+        }
+    }
+}
+
+
+
+
+MST
+
+
+import java.util.*;
+
+public class main2 {
+    // Function to find the sum of weights of edges in the Minimum Spanning Tree
+    static int mst(int v, ArrayList<ArrayList<ArrayList<Integer>>> adj) {
+        PriorityQueue<int[]> pq = new PriorityQueue<>((a, b) -> a[0] - b[0]); // Min-heap for Prim's algorithm
+        boolean[] visited = new boolean[v]; // Visited array
+        pq.add(new int[]{0, 0, -1}); // Start with node 0, cost 0, and no parent (-1)
+        int sum = 0;
+
+        List<int[]> mstEdges = new ArrayList<>(); // To store the edges in the MST
+
+        while (!pq.isEmpty()) {
+            int[] curr = pq.remove();
+            int currdis = curr[0]; // Current distance (edge weight)
+            int node = curr[1];   // Current node
+            int parent = curr[2]; // Parent of the current node
+
+            if (visited[node]) continue; // Skip if already visited
+            visited[node] = true;       // Mark as visited
+            sum += currdis;             // Add the edge weight to MST sum
+
+            // Add the edge to the MST list, except for the starting node
+            if (parent != -1) {
+                mstEdges.add(new int[]{parent, node, currdis});
+            }
+
+            // Iterate over neighbors of the current node
+            for (int i = 0; i < adj.get(node).size(); i++) {
+                ArrayList<Integer> neigh = adj.get(node).get(i); // Get the neighbor
+                int adjNode = neigh.get(0);                     // Adjacent node
+                int edgeWeight = neigh.get(1);                  // Edge weight
+                if (!visited[adjNode]) {
+                    pq.add(new int[]{edgeWeight, adjNode, node});
+                }
+            }
+        }
+
+        // Display the edges of the MST
+        System.out.println("Edges in the MST:");
+        for (int[] edge : mstEdges) {
+            System.out.println("Source: " + edge[0] + " -> Destination: " + edge[1] + " | Weight: " + edge[2]);
+        }
+
+        return sum;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ArrayList<ArrayList<ArrayList<Integer>>> adj = new ArrayList<>();
+        int vertices = 0;
+
+        while (true) {
+            System.out.println("\nMenu:");
+            System.out.println("1. Create Graph");
+            System.out.println("2. Add Edge");
+            System.out.println("3. Calculate MST");
+            System.out.println("4. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter number of vertices: ");
+                    vertices = scanner.nextInt();
+                    adj.clear();
+                    for (int i = 0; i < vertices; i++) {
+                        adj.add(new ArrayList<>());
+                    }
+                    System.out.println("Graph created with " + vertices + " vertices.");
+                    break;
+
+                case 2:
+                    if (vertices == 0) {
+                        System.out.println("Please create the graph first!");
+                        break;
+                    }
+                    System.out.print("Enter source, destination, and weight of the edge: ");
+                    int source = scanner.nextInt();
+                    int destination = scanner.nextInt();
+                    int weight = scanner.nextInt();
+
+                    // Adding edge to adjacency list
+                    ArrayList<Integer> edge1 = new ArrayList<>();
+                    edge1.add(destination);
+                    edge1.add(weight);
+                    adj.get(source).add(edge1);
+
+                    ArrayList<Integer> edge2 = new ArrayList<>();
+                    edge2.add(source);
+                    edge2.add(weight);
+                    adj.get(destination).add(edge2);
+
+                    System.out.println("Edge added: (" + source + ", " + destination + ", " + weight + ")");
+                    break;
+
+                case 3:
+                    if (vertices == 0) {
+                        System.out.println("Please create the graph first!");
+                        break;
+                    }
+                    if (adj.isEmpty()) {
+                        System.out.println("No edges added. Please add edges first!");
+                        break;
+                    }
+                    int sum = mst(vertices, adj);
+                    System.out.println("Total weight of MST: " + sum);
+                    break;
+
+                case 4:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
+
+
+
+min heap 
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Scanner;
+
+class MinHeap {
+    private ArrayList<Integer> heap;
+
+    public MinHeap() {
+        heap = new ArrayList<>();
+    }
+
+    // Insert a value into the heap
+    public void insert(int value) {
+        heap.add(value); // Add the value at the end
+        int index = heap.size() - 1;
+
+        // Heapify up to maintain the Min Heap property
+        while (index > 0) {
+            int parentIndex = (index - 1) / 2;
+
+            if (heap.get(index) >= heap.get(parentIndex)) {
+                break;
+            }
+
+            // Simplified swap using Collections.swap
+            Collections.swap(heap, index, parentIndex);
+
+            index = parentIndex;
+        }
+    }
+
+    // Get the minimum value (root of the heap)
+    public int getMinimum() {
+        if (heap.isEmpty()) {
+            System.out.println("Heap is Empty");
+        }
+        return heap.get(0);
+    }
+
+    // Get the maximum value by scanning the heap
+    public int getMaximum() {
+        if (heap.isEmpty()) {
+            System.out.println("Heap is empty");
+        }
+        int max = Integer.MIN_VALUE;
+        for (int value : heap) {
+            if (value > max) {
+                max = value;
+            }
+        }
+        return max;
+    }
+
+    // Display the heap elements
+    public void displayHeap() {
+        if (heap.isEmpty()) {
+            System.out.println("Heap is empty!");
+        } else {
+            System.out.println("Heap elements: " + heap);
+        }
+    }
+}
+
+public class MinHeapMenu {
+    public static void main(String[] args) {
+        MinHeap minHeap = new MinHeap();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n--- Menu ---");
+            System.out.println("1. Insert marks");
+            System.out.println("2. Find minimum marks");
+            System.out.println("3. Find maximum marks");
+            System.out.println("4. Display heap");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter the marks to insert: ");
+                    int marks = scanner.nextInt();
+                    minHeap.insert(marks);
+                    System.out.println("Marks added to the heap.");
+                    break;
+
+                case 2:
+                    try {
+                        System.out.println("Minimum marks: " + minHeap.getMinimum());
+                    } catch (IllegalStateException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+
+                case 3:
+                    try {
+                        System.out.println("Maximum marks: " + minHeap.getMaximum());
+                    } catch (IllegalStateException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+
+                case 4:
+                    minHeap.displayHeap();
+                    break;
+
+                case 5:
+                    System.out.println("Exiting program...");
+                    scanner.close();
+                    System.exit(0);
+
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
+
+
+
+max heap 
+import java.util.*;
+
+class MaxHeap {
+    private ArrayList<Integer> heap;
+
+    public MaxHeap() {
+        heap = new ArrayList<>();
+    }
+
+    // Insert a value into the heap
+    public void insert(int value) {
+        heap.add(value); // Add the value at the end
+        heapifyUp(heap.size() - 1); // Heapify up to maintain the Max Heap property
+    }
+
+    // Heapify up to maintain the heap property
+    private void heapifyUp(int index) {
+        while (index > 0) {
+            int parentIndex = (index - 1) / 2;
+            if (heap.get(index) <= heap.get(parentIndex)) {
+                break;
+            }
+            // Swap using a temporary variable
+            Collections.swap(heap, index, parentIndex);
+            index = parentIndex;
+        }
+    }
+
+    // Get the maximum value (root of the heap)
+    public int getMaximum() {
+        if (heap.isEmpty()) {
+            System.out.println("Heap is empty");
+            return -1;
+        }
+        return heap.get(0);
+    }
+
+    // Get the minimum value by scanning the heap
+    public int getMinimum() {
+        if (heap.isEmpty()) {
+            System.out.println("Heap is empty");
+            return -1;
+        }
+        int min = Integer.MAX_VALUE;
+        for (int value : heap) {
+            if (value < min) {
+                min = value;
+            }
+        }
+        return min;
+    }
+
+    // Display the heap elements
+    public void displayHeap() {
+        if (heap.isEmpty()) {
+            System.out.println("Heap is empty!");
+        } else {
+            System.out.println("Heap elements: " + heap);
+        }
+    }
+}
+
+public class MaxHeapMenu {
+    public static void main(String[] args) {
+        MaxHeap maxHeap = new MaxHeap();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n--- Menu ---");
+            System.out.println("1. Insert marks");
+            System.out.println("2. Find maximum marks");
+            System.out.println("3. Find minimum marks");
+            System.out.println("4. Display heap");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter the marks to insert: ");
+                    int marks = scanner.nextInt();
+                    maxHeap.insert(marks);
+                    System.out.println("Marks added to the heap.");
+                    break;
+
+                case 2:
+                    System.out.println("Maximum marks: " + maxHeap.getMaximum());
+                    break;
+
+                case 3:
+                    System.out.println("Minimum marks: " + maxHeap.getMinimum());
+                    break;
+
+                case 4:
+                    maxHeap.displayHeap();
+                    break;
+
+                case 5:
+                    System.out.println("Exiting program...");
+                    scanner.close();
+                    System.exit(0);
+
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
+
+
+
+threaded b tree 
+
+
+import java.util.Scanner;
+
+// Class representing a node in the threaded binary tree
+class ThreadedNode {
+    int data;
+    ThreadedNode left, right;
+    boolean leftThread, rightThread;
+
+    public ThreadedNode(int data) {
+        this.data = data;
+        left = right = null;    
+        leftThread = rightThread = false;
+    }
+}
+
+// Class representing the threaded binary tree
+class ThreadedBinaryTree {
+    private ThreadedNode root;
+
+    public ThreadedBinaryTree() {
+        root = null;
+    }
+
+    // Insert a new node into the tree
+    public void insert(int data) {
+        ThreadedNode newNode = new ThreadedNode(data);
+        if (root == null) {
+            root = newNode;
+            return;
+        }
+
+        ThreadedNode current = root;
+        ThreadedNode parent = null;
+
+        while (current != null) {
+            parent = current;
+            if (data < current.data) {
+                if (!current.leftThread) {
+                    current = current.left; // Move left
+                } else {
+                    break; // Found position for new node
+                }
+            } else {
+                if (!current.rightThread) {
+                    current = current.right; // Move right
+                } else {
+                    break; // Found position for new node
+                }
+            }
+        }
+
+        // Insert new node
+        if (data < parent.data) {
+            newNode.left = parent.left;  // Maintain thread to predecessor
+            newNode.right = parent;      // Thread to parent
+            newNode.leftThread = true;   // Left is a thread
+            newNode.rightThread = true;  // Right is a thread
+            parent.leftThread = false;   // No longer a thread
+            parent.left = newNode;       // Link new node as left child
+        } else {
+            newNode.right = parent.right; // Maintain thread to successor
+            newNode.left = parent;        // Thread to parent
+            newNode.leftThread = true;    // Left is a thread
+            newNode.rightThread = true;   // Right is a thread
+            parent.rightThread = false;   // No longer a thread
+            parent.right = newNode;       // Link new node as right child
+        }
+    }
+
+    // Find the leftmost node in a subtree
+    private ThreadedNode leftMost(ThreadedNode node) {
+        if (node == null) return null;
+        while (!node.leftThread && node.left != null) {
+            node = node.left; // Go to the leftmost child
+        }
+        return node;
+    }
+
+    // Inorder traversal using threads
+    public void inorderTraversal() {
+        ThreadedNode current = leftMost(root);
+
+        while (current != null) {
+            System.out.print(current.data + " ");
+
+            if (current.rightThread) {
+                current = current.right; // Move to successor via thread
+            } else {
+                current = leftMost(current.right); // Go to leftmost of right subtree
+            }
+        }
+    }
+}
+
+// Main class to demonstrate the threaded binary tree functionality
+public class Main {
+    public static void main(String[] args) {
+        ThreadedBinaryTree tbt = new ThreadedBinaryTree();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n--- Menu ---");
+            System.out.println("1. Insert a node");
+            System.out.println("2. Display inorder traversal");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter the value to insert: ");
+                    int value = scanner.nextInt();
+                    tbt.insert(value);
+                    System.out.println("Node " + value + " inserted successfully.");
+                    break;
+
+                case 2:
+                    System.out.println("Inorder Traversal of the Threaded Binary Tree:");
+                    tbt.inorderTraversal();
+                    System.out.println();
+                    break;
+
+                case 3:
+                    System.out.println("Exiting program...");
+                    scanner.close();
+                    System.exit(0);
+                    break;
+
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
